@@ -113,13 +113,13 @@ endif
 
 ###################################################
 
-.PHONY: all dirs program debug example clean veryclean
+.PHONY: all dirs program debug template clean
 
 all: $(TARGET).elf
 
 -include $(DEPS)
 
-dirs: dep obj
+dirs: dep obj cube
 dep obj src:
 	@echo "[MKDIR]   $@"
 	$Qmkdir -p $@
@@ -151,11 +151,11 @@ cube:
 	chmod -R u+w cube
 	rm -f cube.zip
 
-example: cube src
-	cp -r $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/Src/* src
-	cp -r $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/Inc/* src
-	cp $(DEV_DIR)/Source/Templates/gcc/startup_$(MCU_LC).s src
-	cp $(DEV_DIR)/Source/Templates/gcc/linker/$(MCU_UC)_FLASH.ld scripts/$(MCU_LC).ld
+template: cube src
+	cp -ri $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/Src/* src
+	cp -ri $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/Inc/* src
+	cp -i $(DEV_DIR)/Source/Templates/gcc/startup_$(MCU_LC).s src
+	cp -i $(DEV_DIR)/Source/Templates/gcc/linker/$(MCU_UC)_FLASH.ld scripts/$(MCU_LC).ld
 
 clean:
 	@echo "[RM]      $(TARGET).elf"; rm -f $(TARGET).elf
@@ -164,6 +164,3 @@ clean:
 	@echo "[RMDIR]   dep"          ; rm -fr dep
 	@echo "[RMDIR]   obj"          ; rm -fr obj
 
-veryclean: clean
-	@echo "[RMDIR]   cube"         ; rm -fr cube
-	@echo "[RM]      $(MCU_LC).ld" ; rm -f $(MCU_LC).ld
