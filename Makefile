@@ -1,6 +1,17 @@
 # STM32 Makefile for GNU toolchain and openocd
 #
-# Copyright	2013 Steffen Vogel
+# This Makefile fetches the Cube firmware package from ST's' website.
+# This includes: CMSIS, STM32 HAL, BSPs, USB drivers and examples.
+#
+# Usage:
+#	make cube		Download and unzip Cube firmware
+#	make program		Flash the board with OpenOCD
+#	make openocd		Start OpenOCD
+#	make debug		Start GDB and attach to OpenOCD
+#	make dirs		Create subdirs like obj, dep, ..
+#	make template		Prepare a simple example project in this dir
+#
+# Copyright	2015 Steffen Vogel
 # License	http://www.gnu.org/licenses/gpl.txt GNU Public License
 # Author	Steffen Vogel <post@steffenvogel.de>
 # Link		http://www.steffenvogel.de
