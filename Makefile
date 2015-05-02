@@ -22,15 +22,6 @@ TARGET     = demo
 
 # Take a look into $(CUBE_DIR)/Drivers/BSP for available BSPs
 BOARD      = STM32F3-Discovery
-#BOARD     = STM32303C_EVAL
-#BOARD     = STM32303E_EVAL
-#BOARD     = STM32373C_EVAL
-#BOARD     = STM32F302R8-Nucleo
-#BOARD     = STM32F303RE-Nucleo
-#BOARD     = STM32F3348-Discovery
-#BOARD     = STM32F334R8-Nucleo
-#BOARD     = STM32F3-Discovery
-#BOARD     = Adafruit_Shield
 
 # location of OpenOCD Board .cfg files (only used with 'make program')
 OCDDIR    = /usr/share/openocd/scripts
@@ -52,11 +43,9 @@ SRCS       = main.c
 SRCS      += system_$(MCU_FAMILY).c
 SRCS      += stm32f3xx_it.c
 
-SRCS      += stm32f3xx_hal_rcc.c
-SRCS      += stm32f3xx_hal_rcc_ex.c
-SRCS      += stm32f3xx_hal.c
-SRCS      += stm32f3xx_hal_cortex.c
-SRCS      += stm32f3xx_hal_gpio.c
+# Basic HAL libraries
+SRCS      += stm32f3xx_hal_rcc.c stm32f3xx_hal_rcc_ex.c stm32f3xx_hal.c stm32f3xx_hal_cortex.c stm32f3xx_hal_gpio.c
+
 
 CUBE_URL   = http://www.st.com/st-web-ui/static/active/en/st_prod_software_internet/resource/technical/software/firmware/stm32cubef3.zip
 CUBE_DIR   = cube
@@ -85,17 +74,17 @@ OCD        = openocd
 # Options
 
 # Defines
-DEFS       = -D $(MCU_MC)
+DEFS       = -D$(MCU_MC) -DUSE_HAL_DRIVER
 
 # Include search paths (-I)
-INCS       = -I src
-INCS      += -I $(BSP_DIR)
-INCS      += -I $(CMSIS_DIR)/Include
-INCS      += -I $(DEV_DIR)/Include
-INCS      += -I $(HAL_DIR)/Inc
+INCS       = -Isrc
+INCS      += -I$(BSP_DIR)
+INCS      += -I$(CMSIS_DIR)/Include
+INCS      += -I$(DEV_DIR)/Include
+INCS      += -I$(HAL_DIR)/Inc
 
 # Library search paths
-LIBS       = -L $(CMSIS_DIR)/Lib
+LIBS       = -L$(CMSIS_DIR)/Lib
 
 # Compiler flags
 CFLAGS     = -Wall -g -std=c99 -Os
@@ -105,7 +94,7 @@ CFLAGS    += -ffunction-sections -fdata-sections
 CFLAGS    += $(INCS) $(DEFS)
 
 # Linker flags
-LDFLAGS    = -Wl,--gc-sections -Wl,-Map=$(TARGET).map $(LIBS) -T $(MCU_LC).ld
+LDFLAGS    = -Wl,--gc-sections -Wl,-Map=$(TARGET).map $(LIBS) -T$(MCU_LC).ld
 
 # Source search paths
 VPATH      = ./src
@@ -156,11 +145,12 @@ debug:
 		-ex "load" $(GDBFLAGS) $(TARGET).elf
 
 cube:
-	wget -O cube.zip $(CUBE_URL)
-	unzip cube.zip
-	mv STM32Cube* cube
-	chmod -R u+w cube
-	rm -f cube.zip
+	rm -fr $(CUBE_DIR)
+	wget -O /tmp/cube.zip $(CUBE_URL)
+	unzip /tmp/cube.zip
+	mv STM32Cube* $(CUBE_DIR)
+	chmod -R u+w $(CUBE_DIR)
+	rm -f /tmp/cube.zip
 
 template: cube src
 	cp -ri $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/Src/* src
