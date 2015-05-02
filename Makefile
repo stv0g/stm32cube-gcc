@@ -21,7 +21,10 @@ BOARD      = STM32F3-Discovery
 #BOARD     = STM32F3-Discovery
 #BOARD     = Adafruit_Shield
 
-OCDFLAGS   = -f board/stm32f3discovery.cfg
+# location of OpenOCD Board .cfg files (only used with 'make program')
+OCDDIR    = /usr/share/openocd/scripts
+
+OCDFLAGS   = -f $(OCDDIR)/board/stm32f3discovery.cfg
 GDBFLAGS   = 
 
 #EXAMPLE   = Templates
@@ -51,9 +54,6 @@ BSP_DIR    = $(CUBE_DIR)/Drivers/BSP/$(BOARD)
 HAL_DIR    = $(CUBE_DIR)/Drivers/STM32F3xx_HAL_Driver
 CMSIS_DIR  = $(CUBE_DIR)/Drivers/CMSIS
 DEV_DIR    = $(CMSIS_DIR)/Device/ST/STM32F3xx
-
-# location of OpenOCD Board .cfg files (only used with 'make program')
-OCD_DIR    = /usr/share/openocd/scripts/board
 
 # that's it, no need to change anything below this line!
 
@@ -137,7 +137,7 @@ $(TARGET).elf: $(OBJS)
 	$(SIZE) $(TARGET).elf
 
 program: all
-	$(OCD) -c "program $(TARGET).elf verify reset" $(OCDFLAGS)
+	$(OCD) $(OCDFLAGS) -c "program $(TARGET).elf verify reset"
 
 debug:
 	$(GDB)  -ex "target remote | openocd $(OCDFLAGS) -c 'gdb_port pipe'" \
