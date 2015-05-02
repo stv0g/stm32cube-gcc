@@ -77,6 +77,9 @@ OCD        = openocd
 # Defines
 DEFS       = -D$(MCU_MC) -DUSE_HAL_DRIVER
 
+# Debug specific definitions for semihosting
+DEFS       += -DUSE_DBPRINTF
+
 # Include search paths (-I)
 INCS       = -Isrc
 INCS      += -I$(BSP_DIR)
@@ -97,8 +100,12 @@ CFLAGS    += $(INCS) $(DEFS)
 # Linker flags
 LDFLAGS    = -Wl,--gc-sections -Wl,-Map=$(TARGET).map $(LIBS) -T$(MCU_LC).ld
 
+# Enable Semihosting
+LDFLAGS   += --specs=rdimon.specs -lc -lrdimon
+
 # Source search paths
 VPATH      = ./src
+VPATH     += $(BSP_DIR)
 VPATH     += $(HAL_DIR)/Src
 VPATH     += $(DEV_DIR)/Source/
 
@@ -144,9 +151,16 @@ program: all
 	$(OCD) -s $(OCD_DIR) $(OCDFLAGS) -c "program $(TARGET).elf verify reset"
 
 debug:
-	$(GDB)  -ex "target remote | openocd $(OCDFLAGS) -c 'gdb_port pipe'" \
-		-ex "monitor reset halt" \
-		-ex "load" $(GDBFLAGS) $(TARGET).elf
+	@if ! nc -z localhost 3333; then \
+		echo "\n\t[Error] OpenOCD is not running! Start it with: 'make openocd'\n"; exit 1; \
+	else \
+		$(GDB)  -ex "target extended localhost:3333" \
+			-ex "monitor arm semihosting enable" \
+			-ex "monitor reset halt" \
+			-ex "load" \
+			-ex "monitor reset init" \
+			$(GDBFLAGS) $(TARGET).elf; \
+	fi
 
 cube:
 	rm -fr $(CUBE_DIR)
