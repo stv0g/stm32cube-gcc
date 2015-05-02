@@ -23,10 +23,7 @@ TARGET     = demo
 # Take a look into $(CUBE_DIR)/Drivers/BSP for available BSPs
 BOARD      = STM32F3-Discovery
 
-# location of OpenOCD Board .cfg files (only used with 'make program')
-OCDDIR    = /usr/share/openocd/scripts
-
-OCDFLAGS   = -f $(OCDDIR)/board/stm32f3discovery.cfg
+OCDFLAGS   = -f board/stm32f3discovery.cfg
 GDBFLAGS   = 
 
 #EXAMPLE   = Templates
@@ -46,14 +43,18 @@ SRCS      += stm32f3xx_it.c
 # Basic HAL libraries
 SRCS      += stm32f3xx_hal_rcc.c stm32f3xx_hal_rcc_ex.c stm32f3xx_hal.c stm32f3xx_hal_cortex.c stm32f3xx_hal_gpio.c
 
+# Directories
+OCD_DIR    = /usr/share/openocd/scripts
 
-CUBE_URL   = http://www.st.com/st-web-ui/static/active/en/st_prod_software_internet/resource/technical/software/firmware/stm32cubef3.zip
 CUBE_DIR   = cube
 
 BSP_DIR    = $(CUBE_DIR)/Drivers/BSP/$(BOARD)
 HAL_DIR    = $(CUBE_DIR)/Drivers/STM32F3xx_HAL_Driver
 CMSIS_DIR  = $(CUBE_DIR)/Drivers/CMSIS
+
 DEV_DIR    = $(CMSIS_DIR)/Device/ST/STM32F3xx
+
+CUBE_URL   = http://www.st.com/st-web-ui/static/active/en/st_prod_software_internet/resource/technical/software/firmware/stm32cubef3.zip
 
 # that's it, no need to change anything below this line!
 
@@ -136,8 +137,11 @@ $(TARGET).elf: $(OBJS)
 	@echo "[SIZE]    $(TARGET).elf"
 	$(SIZE) $(TARGET).elf
 
+openocd:
+	$(OCD) -s $(OCD_DIR) $(OCDFLAGS)
+
 program: all
-	$(OCD) $(OCDFLAGS) -c "program $(TARGET).elf verify reset"
+	$(OCD) -s $(OCD_DIR) $(OCDFLAGS) -c "program $(TARGET).elf verify reset"
 
 debug:
 	$(GDB)  -ex "target remote | openocd $(OCDFLAGS) -c 'gdb_port pipe'" \
