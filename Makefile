@@ -174,7 +174,7 @@ template: cube src
 	cp -ri $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/Src/* src
 	cp -ri $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/Inc/* src
 	cp -i $(DEV_DIR)/Source/Templates/gcc/startup_$(MCU_LC).s src
-	cp -i $(DEV_DIR)/Source/Templates/gcc/linker/$(MCU_UC)_FLASH.ld scripts/$(MCU_LC).ld
+	cp -i $(DEV_DIR)/Source/Templates/gcc/linker/$(MCU_UC)_FLASH.ld $(MCU_LC).ld
 
 clean:
 	@echo "[RM]      $(TARGET).elf"; rm -f $(TARGET).elf
