@@ -22,20 +22,27 @@
 TARGET     = demo
 
 # Take a look into $(CUBE_DIR)/Drivers/BSP for available BSPs
-BOARD      = STM32F4-Discovery
-BSP_BASE   = stm32f4_discovery
+# name needed in upper case and lower case
+BOARD      = STM32F446ZE-Nucleo
+BOARD_UC   = STM32F4xx_Nucleo_144
+BOARD_LC   = stm32f4xx_nucleo_144
+BSP_BASE   = $(BOARD_LC)
 
 OCDFLAGS   = -f board/stm32f4discovery.cfg
 GDBFLAGS   =
 
 #EXAMPLE   = Templates
-EXAMPLE    = Examples/GPIO/GPIO_EXTI
+EXAMPLE    = Examples/GPIO/GPIO_IOToggle
 
 # MCU family and type in various capitalizations o_O
 MCU_FAMILY = stm32f4xx
-MCU_LC     = stm32f401xc
-MCU_MC     = STM32F407xx
-MCU_UC     = STM32F407VG
+MCU_LC     = stm32f446xx
+MCU_MC     = STM32F446xx
+MCU_UC     = STM32F446ZE
+
+# path of the ld-file inside the example directories
+LDFILE     = $(EXAMPLE)/SW4STM32/$(BOARD_UC)/$(MCU_UC)Tx_FLASH.ld
+#LDFILE     = $(EXAMPLE)/TrueSTUDIO/$(BOARD_UC)/$(MCU_UC)_FLASH.ld
 
 # Your C files from the /src directory
 SRCS       = main.c
@@ -43,14 +50,14 @@ SRCS      += system_$(MCU_FAMILY).c
 SRCS      += stm32f4xx_it.c
 
 # Basic HAL libraries
-SRCS      += stm32f4xx_hal_rcc.c stm32f4xx_hal_rcc_ex.c stm32f4xx_hal.c stm32f4xx_hal_cortex.c stm32f4xx_hal_gpio.c $(BSP_BASE).c
+SRCS      += stm32f4xx_hal_rcc.c stm32f4xx_hal_rcc_ex.c stm32f4xx_hal.c stm32f4xx_hal_cortex.c stm32f4xx_hal_gpio.c stm32f4xx_hal_pwr_ex.c $(BSP_BASE).c
 
 # Directories
 OCD_DIR    = /usr/share/openocd/scripts
 
 CUBE_DIR   = cube
 
-BSP_DIR    = $(CUBE_DIR)/Drivers/BSP/$(BOARD)
+BSP_DIR    = $(CUBE_DIR)/Drivers/BSP/$(BOARD_UC)
 HAL_DIR    = $(CUBE_DIR)/Drivers/STM32F4xx_HAL_Driver
 CMSIS_DIR  = $(CUBE_DIR)/Drivers/CMSIS
 
@@ -180,7 +187,7 @@ template: cube src
 	cp -ri $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/Src/* src
 	cp -ri $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/Inc/* src
 	cp -i $(DEV_DIR)/Source/Templates/gcc/startup_$(MCU_LC).s src
-	cp -i $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/TrueSTUDIO/$(BOARD)/$(MCU_UC)_FLASH.ld $(MCU_LC).ld
+	cp -i $(CUBE_DIR)/Projects/$(BOARD)/$(LDFILE) $(MCU_LC).ld
 
 clean:
 	@echo "[RM]      $(TARGET).bin"; rm -f $(TARGET).bin
