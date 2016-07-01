@@ -125,7 +125,7 @@ endif
 
 .PHONY: all dirs program debug template clean
 
-all: $(TARGET).elf
+all: $(TARGET).bin
 
 -include $(DEPS)
 
@@ -145,6 +145,10 @@ $(TARGET).elf: $(OBJS)
 	$Q$(OBJDUMP) -St $(TARGET).elf >$(TARGET).lst
 	@echo "[SIZE]    $(TARGET).elf"
 	$(SIZE) $(TARGET).elf
+
+$(TARGET).bin: $(TARGET).elf
+	@echo "[OBJCOPY] $(TARGET).bin"
+	$Q$(OBJCOPY) -O binary $< $@
 
 openocd:
 	$(OCD) -s $(OCD_DIR) $(OCDFLAGS)
@@ -179,6 +183,7 @@ template: cube src
 	cp -i $(CUBE_DIR)/Projects/$(BOARD)/$(EXAMPLE)/TrueSTUDIO/$(BOARD)/$(MCU_UC)_FLASH.ld $(MCU_LC).ld
 
 clean:
+	@echo "[RM]      $(TARGET).bin"; rm -f $(TARGET).bin
 	@echo "[RM]      $(TARGET).elf"; rm -f $(TARGET).elf
 	@echo "[RM]      $(TARGET).map"; rm -f $(TARGET).map
 	@echo "[RM]      $(TARGET).lst"; rm -f $(TARGET).lst
